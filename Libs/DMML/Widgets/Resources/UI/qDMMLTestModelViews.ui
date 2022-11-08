@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1054</width>
+    <height>804</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="qDMMLSceneFactoryWidget" name="DMMLSceneFactoryWidget"/>
+   </item>
+   <item>
+    <widget class="qDMMLNodeComboBox" name="DMMLNodeComboBox">
+     <property name="nodeTypes">
+      <stringlist>
+       <string>vtkDMMLCameraNode</string>
+      </stringlist>
+     </property>
+     <property name="showChildNodeTypes">
+      <bool>false</bool>
+     </property>
+     <property name="selectNodeUponCreation">
+      <bool>false</bool>
+     </property>
+     <property name="noneEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="removeEnabled">
+      <bool>false</bool>
+     </property>
+     <property name="editEnabled">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="qDMMLListWidget" name="DMMLListWidget">
+       <property name="dragEnabled">
+        <bool>true</bool>
+       </property>
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::DragDrop</enum>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="qDMMLTreeView" name="DMMLTreeView">
+       <property name="dragEnabled">
+        <bool>true</bool>
+       </property>
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::DragDrop</enum>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>false</bool>
+       </property>
+       <property name="textElideMode">
+        <enum>Qt::ElideMiddle</enum>
+       </property>
+       <property name="animated">
+        <bool>true</bool>
+       </property>
+       <property name="allColumnsShowFocus">
+        <bool>false</bool>
+       </property>
+       <attribute name="headerDefaultSectionSize">
+        <number>200</number>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>qDMMLListWidget</class>
+   <extends>QListView</extends>
+   <header>qDMMLListWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>qDMMLNodeComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qDMMLNodeComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>qDMMLTreeView</class>
+   <extends>QTreeView</extends>
+   <header>qDMMLTreeView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>qDMMLSceneFactoryWidget</class>
+   <extends>QWidget</extends>
+   <header>qDMMLSceneFactoryWidgetPlugin.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>DMMLSceneFactoryWidget</sender>
+   <signal>dmmlSceneChanged(vtkDMMLScene*)</signal>
+   <receiver>DMMLListWidget</receiver>
+   <slot>setDMMLScene(vtkDMMLScene*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>359</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>374</x>
+     <y>362</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DMMLSceneFactoryWidget</sender>
+   <signal>dmmlSceneChanged(vtkDMMLScene*)</signal>
+   <receiver>DMMLTreeView</receiver>
+   <slot>setDMMLScene(vtkDMMLScene*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>678</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>698</x>
+     <y>491</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DMMLSceneFactoryWidget</sender>
+   <signal>dmmlSceneChanged(vtkDMMLScene*)</signal>
+   <receiver>DMMLNodeComboBox</receiver>
+   <slot>setDMMLScene(vtkDMMLScene*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>427</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>432</x>
+     <y>182</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

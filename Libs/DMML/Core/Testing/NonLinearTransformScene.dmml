@@ -1,0 +1,18 @@
+<DMML  version="Slicer4.4.0" userTags="">
+ <TransformStorage
+  id="vtkDMMLTransformStorageNode1"  name="TransformStorage"  hideFromEditors="true"  selectable="true"  selected="false"  fileName="TestData/Bspline-f-m.tfm"  useCompression="1"  readState="0"  writeState="0"  preferITKv3CompatibleTransforms="true" ></TransformStorage>
+ <BSplineTransform
+  id="vtkDMMLBSplineTransformNode1"  name="Bspline-f-m"  hideFromEditors="false"  selectable="true"  selected="false"  storageNodeRef="vtkDMMLTransformStorageNode1"  references="storage:vtkDMMLTransformStorageNode1;"  userTags="" ></BSplineTransform>
+ <TransformStorage
+  id="vtkDMMLTransformStorageNode2"  name="TransformStorage"  hideFromEditors="true"  selectable="true"  selected="false"  fileName="TestData/deform2x2x2_ras.nrrd"  useCompression="1"  readState="0"  writeState="0"  preferITKv3CompatibleTransforms="true" ></TransformStorage>
+ <GridTransform
+  id="vtkDMMLGridTransformNode1"  name="deform2x2x2_ras"  hideFromEditors="false"  selectable="true"  selected="false"  storageNodeRef="vtkDMMLTransformStorageNode2"  references="storage:vtkDMMLTransformStorageNode2;"  userTags="" ></GridTransform>
+ <TransformStorage
+  id="vtkDMMLTransformStorageNode3"  name="TransformStorage_1"  hideFromEditors="true"  selectable="true"  selected="false"  fileName="TestData/TpsTransform.h5"  useCompression="1"  readState="0"  writeState="0"  preferITKv3CompatibleTransforms="true" ></TransformStorage>
+ <Transform
+  id="vtkDMMLTransformNode1"  name="TpsTransform"  hideFromEditors="false"  selectable="true"  selected="false"  storageNodeRef="vtkDMMLTransformStorageNode3"  references="storage:vtkDMMLTransformStorageNode3;"  userTags="" ></Transform>
+ <TransformStorage
+  id="vtkDMMLTransformStorageNode4"  name="TransformStorage_2"  hideFromEditors="true"  selectable="true"  selected="false"  fileName="TestData/BSplineLinearCompositeTransform.h5"  useCompression="1"  readState="0"  writeState="0" ></TransformStorage>
+ <Transform
+  id="vtkDMMLTransformNode2"  name="BSplineLinearCompositeTransform"  hideFromEditors="false"  selectable="true"  selected="false"  storageNodeRef="vtkDMMLTransformStorageNode4"  references="storage:vtkDMMLTransformStorageNode4;"  userTags="" ></Transform>
+</DMML>

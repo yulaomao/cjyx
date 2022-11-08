@@ -1,0 +1,25 @@
+/*
+ * Here is where system computed values get stored.
+ * These values should only change when the target compile platform changes.
+ */
+
+#if defined(WIN32) && !defined(VTKDMML_STATIC)
+#pragma warning ( disable : 4275 )
+#endif
+
+#cmakedefine BUILD_SHARED_LIBS
+#ifndef BUILD_SHARED_LIBS
+#define VTKDMML_STATIC
+#endif
+
+#cmakedefine DMML_USE_TEEM
+#cmakedefine DMML_USE_vtkTeem
+
+#define DMML_APPLICATION_NAME "@DMML_APPLICATION_NAME@"
+#define DMML_APPLICATION_VERSION @DMML_APPLICATION_VERSION@
+#define DMML_APPLICATION_REVISION @DMML_APPLICATION_REVISION@
+#define DMML_APPLICATION_SUPPORT_VERSION @DMML_APPLICATION_SUPPORT_VERSION@
+
+#define DMML_APPLICATION_HOME_DIR_ENV "@DMML_APPLICATION_HOME_DIR_ENV@"
+#define DMML_APPLICATION_OPENGL_PROFILE_ENV "@DMML_APPLICATION_OPENGL_PROFILE_ENV@"
+#define DMML_APPLICATION_SHARE_SUBDIR "@DMML_APPLICATION_SHARE_SUBDIR@"

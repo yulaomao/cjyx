@@ -1,0 +1,3 @@
+vtkDMMLSliceLogic GetBackgroundSliceSpacing 307 3
+vtkDMMLSliceLogic GetVolumeSliceSpacing 307 3
+vtkDMMLSliceLogic GetLowestVolumeSliceSpacing 307 3

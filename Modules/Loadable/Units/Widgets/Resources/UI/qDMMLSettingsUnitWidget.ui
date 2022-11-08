@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>qDMMLSettingsUnitWidget</class>
+ <widget class="QWidget" name="qDMMLSettingsUnitWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>121</width>
+    <height>97</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="UnitLabel">
+     <property name="text">
+      <string>Unit:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="qDMMLNodeComboBox" name="UnitNodeComboBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="toolTip">
+      <string>Select the current unit node to modify.</string>
+     </property>
+     <property name="nodeTypes">
+      <stringlist>
+       <string>vtkDMMLUnitNode</string>
+      </stringlist>
+     </property>
+     <property name="showHidden">
+      <bool>true</bool>
+     </property>
+     <property name="addEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="removeEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="renameEnabled">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="qDMMLUnitWidget" name="UnitInfoWidget"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>qDMMLNodeComboBox</class>
+   <extends>QWidget</extends>
+   <header>qDMMLNodeComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>qDMMLWidget</class>
+   <extends>QWidget</extends>
+   <header>qDMMLWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>qDMMLUnitWidget</class>
+   <extends>qDMMLWidget</extends>
+   <header>qDMMLUnitWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

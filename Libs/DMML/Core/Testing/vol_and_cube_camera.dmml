@@ -1,0 +1,30 @@
+<DMML>
+<Selection
+ id="vtkDMMLSelectionNode1" name=""  hideFromEditors="true" activeVolumeID="vtkDMMLScalarVolumeNode1" activeLabelVolumeID="NULL" ></Selection>
+<Slice
+ id="filevtkDMMLSliceNode1" name="yellowAxial"  hideFromEditors="true" fieldOfView="283.203 261.719 250" dimensions="290 268 1" sliceToRAS="-1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" layoutName="Yellow" orientation="Axial" ></Slice>
+<SliceComposite
+ id="vtkDMMLSliceCompositeNode1" name="fileCompred"  hideFromEditors="true" backgroundVolumeID="vtkDMMLScalarVolumeNode1" foregroundVolumeID="" labelVolumeID="" labelOpacity="1" layoutName="Red" ></SliceComposite>
+<Slice
+ id="filevtkDMMLSliceNode2" name="greenSagittal"  hideFromEditors="true" fieldOfView="250 250 250" dimensions="256 256 1" sliceToRAS="0 0 1 0 -1 0 0 0 0 1 0 0 0 0 0 1" layoutName="Green" orientation="Sagittal" ></Slice>
+<SliceComposite
+ id="vtkDMMLSliceCompositeNode2" name="fileCompyellow"  hideFromEditors="true" backgroundVolumeID="vtkDMMLScalarVolumeNode1" foregroundVolumeID="" labelVolumeID="" labelOpacity="1" layoutName="Yellow" ></SliceComposite>
+<Slice
+ id="filevtkDMMLSliceNode3" name="redCoronal"  hideFromEditors="true" fieldOfView="250 250 250" dimensions="256 256 1" sliceToRAS="-1 0 0 0 0 0 1 0 0 1 0 0 0 0 0 1" layoutName="Red" orientation="Coronal" ></Slice>
+<SliceComposite
+ id="vtkDMMLSliceCompositeNode3" name="fileCompgreen"  hideFromEditors="true" backgroundVolumeID="vtkDMMLScalarVolumeNode1" foregroundVolumeID="" labelVolumeID="" labelOpacity="1" layoutName="Green" ></SliceComposite>
+<VolumeArchetypeStorage
+ id="vtkDMMLVolumeArchetypeStorageNode1" name=""  hideFromEditors="true" fileName="TestData/fixed.nrrd" centerImage="1" ></VolumeArchetypeStorage>
+<VolumeDisplay
+ id="vtkDMMLVolumeDisplayNode1" name=""  hideFromEditors="true" window="252" level="109" upperThreshold="235" lowerThreshold="-17" interpolate="1" autoWindowLevel="1" applyThreshold="0" autoThreshold="0" colorNodeRef="vtkDMMLColorTableNodeGrey" ></VolumeDisplay>
+<Volume
+ id="vtkDMMLScalarVolumeNode1" name="fixed.nrrd"  hideFromEditors="false" storageNodeRef="vtkDMMLVolumeArchetypeStorageNode1" displayNodeRef="vtkDMMLVolumeDisplayNode1" ijkToRASDirections="0   -0   1 -1   0   -0 0 -1 0 " spacing="5.2 3.75 3.75" origin="-80.6 120 120" labelMap="0" ></Volume>
+<ModelStorage
+ id="vtkDMMLModelStorageNode1" name=""  hideFromEditors="true" fileName="TestData/cube.vtk" ></ModelStorage>
+<ModelDisplay
+ id="vtkDMMLModelDisplayNode4" name=""  hideFromEditors="true"  color="0.5 0.5 0.5" ambient="0" diffuse="1" specular="0" power="1" opacity="1" visibility="true" clipping="false" backfaceCulling="true" scalarVisibility="false" vectorVisibility="false" tensorVisibility="false" scalarRange="0 100"></ModelDisplay>
+<Model
+ id="vtkDMMLModelNode1" name="cube.vtk"  hideFromEditors="false" storageNodeRef="vtkDMMLModelStorageNode1" displayNodeRef="vtkDMMLModelDisplayNode4" ></Model>
+<Camera
+ id="vtkDMMLCameraNode1" name="Camera1"  hideFromEditors="true"  position="1.33413 1.60042 2.61819" focalPoint="0 0 0" viewUp="-0.100915 0.870923 -0.480946" parallelProjection="false" parallelScale="0"></Camera>
+</DMML>

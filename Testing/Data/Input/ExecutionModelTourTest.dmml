@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DMML  version="Slicer4.4.0" >
+<LinearTransform
+  id="vtkDMMLLinearTransformNode1" name="vtkDMMLLinearTransformNode1" hideFromEditors="false" selectable="true" selected="false" userTags="" matrixTransformToParent="1 0 0 0  0 1 0 0  0 0 1 0  0 0 0 1"></LinearTransform>
+ <LinearTransform
+  id="vtkDMMLLinearTransformNode2" name="vtkDMMLLinearTransformNode1" hideFromEditors="false" selectable="true" selected="false" userTags="" matrixTransformToParent="1 0 0 0  0 1 0 0  0 0 1 0  0 0 0 1" ></LinearTransform>
+</DMML>

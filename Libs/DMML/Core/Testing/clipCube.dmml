@@ -1,0 +1,26 @@
+<DMML>
+<ModelStorage
+ id="vtkDMMLModelStorageNodeXXX" name=""  hideFromEditors="true" fileName="TestData/cube.vtk" ></ModelStorage>
+<ModelDisplay
+ id="vtkDMMLModelDisplayNodeXXX" name=""  hideFromEditors="true"  color="0.5 0.5 0.5" ambient="0" diffuse="1" specular="0" power="1" opacity="1" visibility="true" clipping="true" backfaceCulling="true" scalarVisibility="false" scalarRange="0 100"></ModelDisplay>
+<Selection
+ id="vtkDMMLSelectionNode1" name=""  hideFromEditors="true" activeVolumeID="NULL" activeLabelVolumeID="NULL" ></Selection>
+<Slice
+ id="vtkDMMLSliceNode4" name=""  hideFromEditors="true" fieldOfView="250 250 250" dimensions="256 256 1" sliceToRAS="-1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" layoutName="Green" orientation="Axial" ></Slice>
+<SliceComposite
+ id="vtkDMMLSliceCompositeNode4" name=""  hideFromEditors="true" backgroundVolumeID="" foregroundVolumeID="" labelVolumeID="" labelOpacity="1" layoutName="Green" ></SliceComposite>
+<Slice
+ id="vtkDMMLSliceNode5" name=""  hideFromEditors="true" fieldOfView="250 250 250" dimensions="256 256 1" sliceToRAS="-1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" layoutName="Yellow" orientation="Axial" ></Slice>
+<SliceComposite
+ id="vtkDMMLSliceCompositeNode5" name=""  hideFromEditors="true" backgroundVolumeID="" foregroundVolumeID="" labelVolumeID="" labelOpacity="1" layoutName="Yellow" ></SliceComposite>
+<Slice
+ id="vtkDMMLSliceNode6" name=""  hideFromEditors="true" fieldOfView="250 250 250" dimensions="256 256 1" sliceToRAS="-1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" layoutName="Red" orientation="Axial" ></Slice>
+<SliceComposite
+ id="vtkDMMLSliceCompositeNode6" name=""  hideFromEditors="true" backgroundVolumeID="" foregroundVolumeID="" labelVolumeID="" labelOpacity="1" layoutName="Red" ></SliceComposite>
+<ClipModels
+ id="vtkDMMLClipModelsNode1" name="ClipModelsParameters0"  hideFromEditors="true"  clipType="0" redSliceClipState="1" yellowSliceClipState="0" greenSliceClipState="0"></ClipModels>
+<LinearTransform
+ id="vtkDMMLLinearTransformNode1" name="vtkDMMLLinearTransformNode1"  hideFromEditors="false" matrixTransformToParent="100 0 0 0  0 100 0 0  0 0 100 0  0 0 0 1" ></LinearTransform>
+<Model
+ id="vtkDMMLModelNodeXXX" name="cube.vtk"  hideFromEditors="false" transformNodeRef="vtkDMMLLinearTransformNode1" storageNodeRef="vtkDMMLModelStorageNodeXXX" displayNodeRef="vtkDMMLModelDisplayNodeXXX" ></Model>
+</DMML>

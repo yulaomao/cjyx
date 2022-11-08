@@ -1,0 +1,4 @@
+vtkDMMLROIListNode GetNthROIXYZ 301 3
+vtkDMMLROIListNode GetNthROIRadiusXYZ 301 3
+vtkDMMLROIListNode GetNthROIIJK 301 3
+vtkDMMLROIListNode GetNthROIRadiusIJK 301 3
