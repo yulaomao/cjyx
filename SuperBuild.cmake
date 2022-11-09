@@ -336,7 +336,7 @@ Cjyx_Remote_Add(LandmarkRegistration
 list_conditional_append(Cjyx_BUILD_LandmarkRegistration Cjyx_REMOTE_DEPENDENCIES LandmarkRegistration)
 
 Cjyx_Remote_Add(SurfaceToolbox
-  GIT_REPOSITORY "${EP_GIT_PROTOCOL}://github.com/yulaomao/SlicerSurfaceToolbox"
+  GIT_REPOSITORY "${EP_GIT_PROTOCOL}://github.com/yulaomao/SurfaceToolbox"
   GIT_TAG 8da85e6bc22afec1e23d225be7cb8fd9a2952dea
   OPTION_NAME Cjyx_BUILD_SurfaceToolbox
   OPTION_DEPENDS "Cjyx_USE_PYTHONQT"
