@@ -159,7 +159,7 @@ QString qCjyxUtils::extractModuleNameFromLibraryName(const QString& libraryName)
   // Remove prefix 'qCjyx' if needed
   if (moduleName.indexOf("qCjyx") == 0)
     {
-    moduleName.remove(0, 7);
+    moduleName.remove(0, 5);
     }
 
   // Remove suffix 'Module' if needed
@@ -187,7 +187,7 @@ QString qCjyxUtils::extractModuleNameFromClassName(const QString& className)
   // Remove prefix 'qCjyx' if needed
   if (moduleName.indexOf("qCjyx") == 0)
     {
-    moduleName.remove(0, 7);
+    moduleName.remove(0, 5);
     }
 
   // Remove suffix 'Module' if needed
