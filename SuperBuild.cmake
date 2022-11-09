@@ -245,8 +245,8 @@ Cjyx_Remote_Add(MultiVolumeImporter
 list_conditional_append(Cjyx_BUILD_MultiVolumeImporter Cjyx_REMOTE_DEPENDENCIES MultiVolumeImporter)
 
 Cjyx_Remote_Add(SimpleFilters
-  GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/KIC-Crack/SlicerSimpleFilters.git
-  GIT_TAG 56c48373843bd8de4430572d2679cdbb1a0411d2
+  GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/yulaomao/SlicerSimpleFilters.git
+  GIT_TAG 181b2af2bf858a6a329da7a7fe89e52a42cb3ba9
   OPTION_NAME Cjyx_BUILD_SimpleFilters
   OPTION_DEPENDS "Cjyx_BUILD_QTSCRIPTEDMODULES;Cjyx_USE_SimpleITK"
   LABELS REMOTE_MODULE
