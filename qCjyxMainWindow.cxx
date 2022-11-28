@@ -944,13 +944,13 @@ void qCjyxMainWindow::on_FileLoadSceneAction_triggered()
         return;
     PythonQt::init();
     PythonQtObjectPtr context = PythonQt::self()->getMainModule();
-    PyRun_SimpleString("cjyx.modules.datamanager.widgetRepresentation().self().isLoadDMML = True");
+    //PyRun_SimpleString("cjyx.modules.datamanager.widgetRepresentation().self().isLoadDMML = True");
     context.addVariable("filename", fileName);
-    PyRun_SimpleString("cjyx.util.loadScene(filename)");
-    //qCjyxApplication::application()->coreIOManager()->loadScene(fileName);
+    //PyRun_SimpleString("cjyx.util.loadScene(filename)");
+    qCjyxApplication::application()->coreIOManager()->loadScene(fileName);
     
 
-    PyRun_SimpleString("cjyx.modules.celiang.widgetRepresentation().self().ReadFromCJYX(filename)");
+    //PyRun_SimpleString("cjyx.modules.celiang.widgetRepresentation().self().ReadFromCJYX(filename)");
     int num = qCjyxApplication::application()->dmmlScene()->GetNodesByClass("vtkDMMLScalarVolumeNode")->GetNumberOfItems();
     qDebug() << num;
     if (num >0)
@@ -961,7 +961,7 @@ void qCjyxMainWindow::on_FileLoadSceneAction_triggered()
     QStringList list = fileName.split("/");
     this->setWindowTitle(list[list.size() - 1]);
     this->CurrentPath = fileName;
-    PyRun_SimpleString("cjyx.modules.datamanager.widgetRepresentation().self().isLoadDMML = False");
+    //PyRun_SimpleString("cjyx.modules.datamanager.widgetRepresentation().self().isLoadDMML = False");
 }
 
 //---------------------------------------------------------------------------
@@ -1562,14 +1562,34 @@ void qCjyxMainWindow::setupMenuActions()
 //---------------------------------------------------------------------------
 void qCjyxMainWindow::on_LoadDICOMAction_triggered()
 {
+    Q_D(qCjyxMainWindow);
     int num = qCjyxApplication::application()->dmmlScene()->GetNodesByClass("vtkDMMLScalarVolumeNode")->GetNumberOfItems();
     if (num > 0)
     {
-        QMessageBox* message = new QMessageBox(QMessageBox::Information, QString(tr("提示")), QString::fromStdString("当前场景中已经存在体数据，不要重复加载体数据"), QMessageBox::Ok);
-        message->setParent(this);
-        message->button(QMessageBox::Ok)->setText("确定");
+        QMessageBox* message = new QMessageBox(QMessageBox::Information, QString(tr("提示")), QString::fromStdString("当前场景中体数据已经修改，是否保存？新建项目文件将清空当前场景。"), QMessageBox::NoButton, this);
+        QAbstractButton* saveButton =
+            message->addButton(qCjyxMainWindow::tr("保存项目文件"), QMessageBox::ActionRole);
+        QAbstractButton* exitButton =
+            message->addButton(qCjyxMainWindow::tr("不保存（直接清空项目文件）"), QMessageBox::ActionRole);
+        QAbstractButton* cancelButton =
+            message->addButton(qCjyxMainWindow::tr("取消新建项目"), QMessageBox::ActionRole);
         message->exec();
-        return;
+        if (message->clickedButton() == saveButton)
+        {
+            // \todo Check if the save data dialog was "applied" and close the
+            // app in that case
+            d->SaveSceneAction->trigger();
+
+        }
+        else if (message->clickedButton() == exitButton)
+        {
+            d->FileCloseSceneAction->trigger();
+        }
+        else
+        {
+            return;
+        }
+
     }
     PythonQt::init();
     PythonQtObjectPtr context = PythonQt::self()->getMainModule();
@@ -1580,9 +1600,10 @@ void qCjyxMainWindow::on_LoadDICOMAction_triggered()
     if (fileName == "")
         return;
     //qCjyxApplication::application()->coreIOManager()->loadFile(fileName);
+    d->FileCloseSceneAction->trigger();
     context.addVariable("filename", fileName);
     PyRun_SimpleString("cjyx.util.loadVolume(filename)");
-    
+
     qDebug() << num;
     if (num == 1)
     {
@@ -1591,6 +1612,7 @@ void qCjyxMainWindow::on_LoadDICOMAction_triggered()
     }
 
 }
+
 //---------------------------------------------------------------------------
 void qCjyxMainWindow::on_DataManageAction_triggered()
 {
