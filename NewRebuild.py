@@ -9,14 +9,8 @@ from cjyx.util import VTKObservationMixin
 import plistlib
 
 
-#
-# NewRebuild
-#
-
 class NewRebuild(ScriptedLoadableModule):
-    """Uses ScriptedLoadableModule base class, available at:
-    https://github.com/Cjyx/Cjyx/blob/master/Base/Python/cjyx/ScriptedLoadableModule.py
-    """
+
 
     def __init__(self, parent):
         ScriptedLoadableModule.__init__(self, parent)
@@ -25,23 +19,10 @@ class NewRebuild(ScriptedLoadableModule):
         self.parent.dependencies = []  # TODO: add here list of module names that this module requires
         self.parent.contributors = ["John Doe (AnyWare Corp.)"]  # TODO: replace with "Firstname Lastname (Organization)"
         # TODO: update with short description of the module and a link to online module documentation
-        self.parent.helpText = """
-This is an example of scripted loadable module bundled in an extension.
-See more information in <a href="https://github.com/organization/projectname#NewRebuild">module documentation</a>.
-"""
-        # TODO: replace with organization, grant and thanks
-        self.parent.acknowledgementText = """
-This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc., Andras Lasso, PerkLab,
-and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR013218-12S1.
-"""
 
-# NewRebuildWidget
-#
+
 
 class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
-    """Uses ScriptedLoadableModuleWidget base class, available at:
-    https://github.com/Cjyx/Cjyx/blob/master/Base/Python/cjyx/ScriptedLoadableModule.py
-    """
 
     def __init__(self, parent=None):
         """
@@ -79,6 +60,7 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.uiInitial()
         self.addObserver(cjyx.dmmlScene,cjyx.dmmlScene.NodeAddedEvent, self.onNodeAdded)
         self.addObserver(cjyx.dmmlScene, cjyx.dmmlScene.EndCloseEvent, self.cleanup1)
+        self.AllButtonSetEnabled(False)
 
     
     def onSceneStartClose_seg(self,unusedArg1=None, unusedArg2=None, unusedArg3=None):
@@ -160,6 +142,7 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.radioButton_bu1.setIcon(self.getTwoIcon("补集"))
         self.ui.pushButton_fenli_paint.setIcon(self.getTwoIcon("画笔"))
         self.ui.pushButton_fenli_erase.setIcon(self.getTwoIcon("橡皮"))
+        self.ui.pushbutton_copy.setIcon(self.getTwoIcon("copy"))
 
         #窗口
         self.CloseAllToolWidget()
@@ -366,6 +349,7 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             pass
         self.onTableWidget(segment.GetName())
         self.selectCurrentItem(segment.GetName())
+        self.AllButtonSetEnabled(True)
 
 
     def Onpushbutton_remove_segment(self, unusedArg1=None, unusedArg2=None, unusedArg3=None):
@@ -391,6 +375,8 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.selectCurrentItem(item.text())
         except:
             print("选择最后节点出错")
+        if(self.ui.SegmenttableWidget.rowCount ==0):
+            self.AllButtonSetEnabled(False)
 
     def Onpushbutton_undo(self):
         #记录undo前分段，以识别撤销新添的分段，并将其设置为3D隐藏
@@ -508,13 +494,11 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             self.r_observe = self.paint_roi.AddObserver(vtk.vtkCommand.ModifiedEvent, self.UpdataFitToVolume)
 
     def Onpushbutton_copy(self):
-        a = self.segmentationNode.GetSegmentation().AddEmptySegment()
+        a = self.segmentationNode.GetSegmentation().AddEmptySegment(self.name1+"_复制")
         segName=self.segmentationNode.GetSegmentation().GetSegment(a).GetName()
         self.segmentationNode.GetDisplayNode().SetSegmentVisibility3D(a, 0)
         self.onBoolTool(segName, self.name1, 'COPY')
         # 更新图层列表
-        segment = self.segmentationNode.GetSegmentation().GetSegment(a)
-        segment.SetName(self.GetUniqueNameByStringInSeg(self.name1+"-复制"))
         try:
             cjyx.modules.datamanager.widgetRepresentation().self().onSegmentNodeAdded(segment)
         except:
@@ -980,6 +964,10 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.pushButton_bool.setEnabled(ifenable)
         self.ui.pushButton_rebuild.setEnabled(ifenable)
         self.ui.SegmenttableWidget.setEnabled(ifenable)
+        if(self.ui.SegmenttableWidget.rowCount >0):
+            self.AllButtonSetEnabled(1)
+        else:
+            self.AllButtonSetEnabled(0)
 
     def onAddTarget(self, unusedArg1=None, unusedArg2=None, unusedArg3=None):
         a = self.segmentationNode.GetSegmentation().AddEmptySegment()
@@ -1281,12 +1269,15 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     # 设置2D显示与隐藏
     def onShowHide(self, checkBox):
         self.selectCurrentItemByID(checkBox.objectName[:-1])
+        print(checkBox.objectName[:-1])
         if checkBox.checked:
             self.segmentationNode.GetDisplayNode().SetSegmentVisibility(checkBox.objectName[:-1], 1)
             for i in range(0, len(self.ui.SegmenttableWidget.findChildren('QPushButton'))):
                 a = self.ui.SegmenttableWidget.findChildren('QPushButton')[i]
                 if a.objectName == checkBox.objectName[:-1] + "b":
                     a.setEnabled(True)
+                    a.setChecked(False)
+
         else:
             self.segmentationNode.GetDisplayNode().SetSegmentVisibility(checkBox.objectName[:-1], 0)
             for i in range(0, len(self.ui.SegmenttableWidget.findChildren('QPushButton'))):
@@ -1425,7 +1416,7 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
 
 
-# 为TableWidget添加行
+  # 为TableWidget添加行
     def onTableWidget(self, name,IfNew=1):
         if name:
             print("name",name)
@@ -1447,7 +1438,6 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             # pushbutton.resize(16,16)
 
             checkBox = qt.QPushButton()
-            checkBox.setCheckable(True)
             iconVisible = self.getTwoIcon("show")
             checkBox.setIcon(iconVisible)
             checkBoxObjectName = segmentID + "a"
@@ -1460,7 +1450,6 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             checkBox1ObjectName = segmentID + "b"
             checkBox1.setObjectName(checkBox1ObjectName)
             checkBox1.setIcon(iconVisible)
-            checkBox1.setCheckable(True)
             checkBox1.setStyleSheet("border:0px;background:transparent;")
             checkBox1.setChecked(False)
 
@@ -1472,7 +1461,7 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             # cjyx.app.layoutManager().threeDWidget('View1').threeDView().resetFocalPoint()
             checkBox1.clicked.connect(lambda arg1: self.onShowHide3D(checkBox1))
             Visible3D=self.segmentationNode.GetDisplayNode().GetSegmentVisibility3D(segmentID)
-            checkBox1.setChecked(Visible3D)
+            checkBox1.setChecked(int(Visible3D))
             # self.iconsPath = os.path.join(os.path.dirname(__file__), 'Resources/Icons')
             # ShowPath = os.path.join(self.iconsPath,'Show.png')
             # HidePath = os.path.join(self.iconsPath,'Hide.png')
@@ -1507,6 +1496,9 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                 pass
         except:
             pass
+        if self.ui.SegmenttableWidget.rowCount>0:
+            self.AllButtonSetEnabled(True)
+        
 
     # 颜色转换(RGBF转化为十六进制)
     def RGBF_to_Hex(self, rgb):
@@ -1537,6 +1529,7 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         icon=qt.QIcon()
         icon.addPixmap(qt.QPixmap(ShowPath), qt.QIcon().Normal, qt.QIcon().Off)
         icon.addPixmap(qt.QPixmap(HidePath), qt.QIcon().Normal, qt.QIcon().On)
+        icon.addPixmap(qt.QPixmap(HidePath), qt.QIcon().Disabled, qt.QIcon().Off)
         return icon
 
     # -------------------------------------------图层分离和多层绘制设置状态-----------------------------
@@ -2018,20 +2011,49 @@ class NewRebuildWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         displayNode.SetVisibility(True)
 
+    def AllButtonSetEnabled(self,bool):
+        self.ui.pushButton_painting.setEnabled(bool)
+        self.ui.pushButton_painting.setEnabled(bool)
 
+        self.ui.pushButton_erase.setEnabled(bool)
+        self.ui.pushbutton_remove_segment.setEnabled(bool)
+        self.ui.pushbutton_copy.setEnabled(bool)
+        self.ui.pushbutton_undo.setEnabled(bool)
+        self.ui.pushbutton_redo.setEnabled(bool)
+        self.ui.label_add_3.setEnabled(bool)
+        self.ui.label_add_6.setEnabled(bool)
+        self.ui.label_remove_7.setEnabled(bool)
+        self.ui.label_remove_4.setEnabled(bool)                
 
+        self.ui.pushButton_undo2.setEnabled(bool)
+        self.ui.pushButton_redo2.setEnabled(bool)
+        self.ui.pushButton_rebuild2.setEnabled(bool)
 
+        self.ui.pushButton_Threshold.setEnabled(bool)
+        self.ui.pushButton_Island.setEnabled(bool)
+        self.ui.pushButton_bool.setEnabled(bool)
+        self.ui.pushButton_expend.setEnabled(bool)
+        self.ui.pushButton_shrink.setEnabled(bool)
+        self.ui.pushButton_rebuild.setEnabled(bool)
+        self.ui.pushButton_ROI.setEnabled(bool)
+        if bool == 0:
+            a = self.ui.widget_manager.findChildren('QFrame')
+            for i in range(0,len(a)):
+                a[i].setStyleSheet("border-top: 1px solid #434346;")
+            b = self.ui.widget_3DTool.findChildren('QFrame')
+            for i in range(0,len(b)):
+                b[i].setStyleSheet("border-top: 1px solid #434346;")
+        else:
+            a = self.ui.widget_manager.findChildren('QFrame')
+            for i in range(0,len(a)):
+                a[i].setStyleSheet("border-top: 1px solid #c8c8c8;") 
+            b = self.ui.widget_3DTool.findChildren('QFrame')
+            for i in range(0,len(b)):
+                b[i].setStyleSheet("border-top: 1px solid #c8c8c8;")
 
 
 class NewRebuildLogic(ScriptedLoadableModuleLogic):
-    """This class should implement all the actual
-    computation done by your module.  The interface
-    should be such that other python code can import
-    this class and make use of the functionality without
-    requiring an instance of the Widget.
-    Uses ScriptedLoadableModuleLogic base class, available at:
-    https://github.com/Cjyx/Cjyx/blob/master/Base/Python/cjyx/ScriptedLoadableModule.py
-    """
+
 
     def __init__(self, unusedArg1=None, unusedArg2=None, unusedArg3=None):
         """
@@ -2062,70 +2084,3 @@ class NewRebuildLogic(ScriptedLoadableModuleLogic):
 
 
 
-#
-# NewRebuildTest
-#
-
-class NewRebuildTest(ScriptedLoadableModuleTest):
-    """
-    This is the test case for your scripted module.
-    Uses ScriptedLoadableModuleTest base class, available at:
-    https://github.com/Cjyx/Cjyx/blob/master/Base/Python/cjyx/ScriptedLoadableModule.py
-    """
-
-    def setUp(self, unusedArg1=None, unusedArg2=None, unusedArg3=None):
-        """ Do whatever is needed to reset the state - typically a scene clear will be enough.
-        """
-        cjyx.dmmlScene.Clear()
-
-    def runTest(self, unusedArg1=None, unusedArg2=None, unusedArg3=None):
-        """Run as few or as many tests as needed here.
-        """
-        self.setUp()
-        self.test_NewRebuild1()
-
-    def test_NewRebuild1(self, unusedArg1=None, unusedArg2=None, unusedArg3=None):
-        """ Ideally you should have several levels of tests.  At the lowest level
-        tests should exercise the functionality of the logic with different inputs
-        (both valid and invalid).  At higher levels your tests should emulate the
-        way the user would interact with your code and confirm that it still works
-        the way you intended.
-        One of the most important features of the tests is that it should alert other
-        developers when their changes will have an impact on the behavior of your
-        module.  For example, if a developer removes a feature that you depend on,
-        your test should break so they know that the feature is needed.
-        """
-
-        self.delayDisplay("Starting the test")
-
-        # Get/create input data
-
-        import SampleData
-        registerSampleData()
-        inputVolume = SampleData.downloadSample('NewRebuild1')
-        self.delayDisplay('Loaded test data set')
-
-        inputScalarRange = inputVolume.GetImageData().GetScalarRange()
-        self.assertEqual(inputScalarRange[0], 0)
-        self.assertEqual(inputScalarRange[1], 695)
-
-        outputVolume = cjyx.dmmlScene.AddNewNodeByClass("vtkDMMLScalarVolumeNode")
-        threshold = 100
-
-        # Test the module logic
-
-        logic = NewRebuildLogic()
-
-        # Test algorithm with non-inverted threshold
-        logic.process(inputVolume, outputVolume, threshold, True)
-        outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        self.assertEqual(outputScalarRange[0], inputScalarRange[0])
-        self.assertEqual(outputScalarRange[1], threshold)
-
-        # Test algorithm with inverted threshold
-        logic.process(inputVolume, outputVolume, threshold, False)
-        outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        self.assertEqual(outputScalarRange[0], inputScalarRange[0])
-        self.assertEqual(outputScalarRange[1], inputScalarRange[1])
-
-        self.delayDisplay('Test passed')
