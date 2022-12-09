@@ -8,10 +8,13 @@ import numpy as np
 import math
 import time
 import threading
-# import tkinter as tk
-# from serial.tools import list_ports
-import serial
+import socket
 
+try:
+  slicer.util.pip_install("pyserial")
+  import serial
+except:
+  pass
 
 #
 # NoImage
@@ -53,7 +56,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     # "setMRMLScene(vtkMRMLScene*)" slot.
     uiWidget.setMRMLScene(slicer.mrmlScene)
     #----------------------------------------------------------------------------------------
-    self.iconsPath = os.path.join(os.path.dirname(__file__), 'Resources/Icons')
+    self.iconsPath = os.path.join(os.path.dirname(__file__), 'Resources/Icons/NoImageIcon')
     self.FilePath = os.path.join(os.path.dirname(__file__), 'ssmdata')
     self.jiatiPath = os.path.join(os.path.dirname(__file__), '假体库')
     self.noimageWidget = slicer.util.findChild(slicer.util.mainWindow(),"NoImageWidget")
@@ -247,8 +250,11 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
   
     self.ui.FemurSwitch.setIcon(qt.QIcon(self.iconsPath+'/FemurSwitch.png'))
     self.ui.TibiaSwitch.setIcon(qt.QIcon(self.iconsPath+'/TibiaSwitch.png'))
-
-    self.onstartDJ()
+    try:
+      self.onstartDJ()
+      print('###########蓝牙串口已开启###########')
+    except:
+      pass
     self.ifsend03=0
 
   #---------------前进后退----------------------------------------------- 
@@ -308,15 +314,15 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       self.onFemurRadioButton()
       self.FemurOrTibia()
       s1 = 0
-      s2 = 1
-      s3 = 0  # 股骨不重置
-      s4 = 0  # 胫骨不重置
-      s5 = 0
+      s2 = 2
+      s3 = 0
+      s4 = 0
+      s5 = 1
       # 股骨或者胫骨图片
       s6 = 1
       s7 = 0
-      s8 = 0
-      self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}@'.encode())
+      s8 = '0@\n'
+      self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
       print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
     if index == 3: #胫骨配准
       self.ui.femurPointWidget.setVisible(False)
@@ -325,17 +331,26 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       self.onTibiaRadioButton()
       self.FemurOrTibia()
       s1 = 0
-      s2 = 1
-      s3 = 0  # 股骨不重置
-      s4 = 0  # 胫骨不重置
+      s2 = 2
+      s3 = 0  
+      s4 = 1
       s5 = 1
-      # 股骨或者胫骨图片
       s6 = 1
       s7 = 0
-      s8 = 0
-      self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}@'.encode())
+      s8 = '0@\n'
+      self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
       print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
     if index == 4:#股骨规划
+      s1 = 0
+      s2 = 3
+      s3 = 0  
+      s4 = 0
+      s5 = 0
+      s6 = 0
+      s7 = 0
+      s8 = '0@\n'
+      self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
+      print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
       self.StopClosestLine()#隐藏胫骨误差线
       self.FemurButtonChecked(None) 
       self.buildPointsInFemur() 
@@ -343,10 +358,30 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       for i in range (0,len(self.noimageWidget.findChildren('QLabel'))):
         self.noimageWidget.findChildren('QLabel')[-1].delete()
     if index == 5:#胫骨规划
+      s1 = 0
+      s2 = 3
+      s3 = 0  
+      s4 = 1
+      s5 = 0
+      s6 = 0
+      s7 = 0
+      s8 = '0@\n'
+      self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
+      print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
       self.HidePart()
       self.TibiaButtonChecked(None)
       self.ShowNode('Tibia')
     if index == 6:#导航
+      s1 = 0
+      s2 = 3
+      s3 = 1  
+      s4 = 2
+      s5 = 0
+      s6 = 0
+      s7 = 0
+      s8 = '0@\n'
+      self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
+      print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
       # try:
       #   try:
       #     self.hideInformation()
@@ -382,26 +417,69 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       self.currentModel -=1
     self.WidgetShow(self.currentModel)
 
+  def handleCalc_do1(self,buf):
+    buf = buf.strip('@').strip(',')
+    buf_list = buf.split('@')
+    for i in range(len(buf_list)):
+      buf_list1 = buf_list[i].strip(',').split(',')
+      if len(buf_list1) == 17:
+        name = buf_list1[0]
+        buf_list1.pop(0)
+        trans = np.zeros([4, 4])
+        for i in range(4):
+          for j in range(4):
+            trans[i][j] = buf_list1[i * 4 + j]
+        self.handleData1(name,trans)
+        print(name)
+
+  def dealigt(self,asd=None,asdasd=None):
+    # 创建客户端套接字
+    sk = socket.socket()
+    # 尝试连接服务器
+    sk.connect(('192.168.3.99', 8898))
+    while True:
+      # 信息接收
+      ret = sk.recv(10240)
+      ret = ret.decode()
+      # print(ret)
+      self.handleCalc_do1(ret)
+      time.sleep(0.014)
+
+  def handleData1(self, name, trans):
+    try:
+      slicer.util.getNode(name).SetAndObserveMatrixTransformToParent(slicer.util.vtkMatrixFromArray(trans))
+    except:
+      transnode = slicer.mrmlScene.AddNewNodeByClass('vtkMRMLLinearTransformNode', name)
+      transnode.SetAndObserveMatrixTransformToParent(slicer.util.vtkMatrixFromArray(trans))
+
   #-----------------初始化-----------------------------------------------
   def onApply(self):
+    self._received_thread_ = threading.Thread(target=self.dealigt, args=(self,))
+    # print("thread")
+    self._is_running_ = True
+    # print("thread1")
+    self._received_thread_.setDaemon(True)
+    # print("thread2")
+    self._received_thread_.setName("Seria124")
+    self._received_thread_.start()
+    print('开始监听信号')
     self.ui.ForwardToolButton.setEnabled(True)
     self.onPrepare()
-    s1 = 0
-    s2 = 3
-    s3 = 1
-    s4 = 2
-    s5 = 0
-    s6 = 0
-    s7 = 0
-    s8tmp = f'{int(self.ui.tool2.enabled)}' + f'{int(self.ui.tool3.enabled)}' + f'{int(self.ui.tool4.enabled)}' + f'{int(self.ui.tool5.enabled)}' + f'{int(self.ui.tool6.enabled)}'
-    s8 = f'{int(s8tmp, 2)}'
-    self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
-    print('已发送',f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
     self.ifsend03=1
     message = qt.QMessageBox(qt.QMessageBox.Information,'提示',"初始化成功！",qt.QMessageBox.Ok)
     message.button(qt.QMessageBox().Ok).setText('确定')
     message.exec()
     self.ui.tool1.setEnabled(True)
+    s1 = 0
+    s2 = 1
+    s3 = 1
+    s4 = 2
+    s5 = 0
+    s6 = 0
+    s7 = 0
+    s8 = f'{int(self.ui.tool2.enabled)}' + f'{int(self.ui.tool3.enabled)}' + f'{int(self.ui.tool4.enabled)}' + f'{int(self.ui.tool5.enabled)}' + f'{int(self.ui.tool6.enabled)}'+'@\n'
+    self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
+    print('已发送',f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
 
 
 
@@ -465,7 +543,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
   def StateChange(self,transformNode,unusedArg2=None, unusedArg3=None):
     self.count += 1
-    if self.count%100==0:
+    if self.count%50==0:
       self.count1 += 1
       self.count=1
       StylusNode=slicer.util.getNode('StylusToTracker')
@@ -498,27 +576,22 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       else:       
         self.ui.tool5.setEnabled(True)
         self.transform4 = transform4
-      if self.count1 % 6 == 0:
-        self.count1=0
-        if self.ifsend03<5:
-          self.ifsend03+=1
-        else:
-          s1 = 0
-          s2 = 2
-          try:
-            s3 = self.currentY  # 外翻
-            s4 = self.currentX  # 屈膝
-          except:
-            s3 = 0  # 外翻
-            s4 = 0  # 屈膝
+      #向小屏幕发送外翻角屈膝角以及工具状态
+      s1 = 1
+      s2 = 0
+      try:
+        s3 = round(self.currentY,2)  # 外翻
+        s4 = round(self.currentX,2)   # 屈膝
+      except:
+        s3 = 0  # 外翻
+        s4 = 0  # 屈膝
 
-          s5 = 0
-          s6 = 0
-          s7 = 0
-          s8tmp = f'{int(self.ui.tool2.enabled)}' + f'{int(self.ui.tool3.enabled)}' + f'{int(self.ui.tool4.enabled)}' + f'{int(self.ui.tool5.enabled)}' + f'{int(self.ui.tool6.enabled)}'
-          s8 = f'{int(s8tmp, 2)}'
-          self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}@'.encode())
-          print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
+      s5 = 0
+      s6 = 0
+      s7 = 0
+      s8 = f'{int(self.ui.tool2.enabled)}' + f'{int(self.ui.tool3.enabled)}' + f'{int(self.ui.tool4.enabled)}' + f'{int(self.ui.tool5.enabled)}' + f'{int(self.ui.tool6.enabled)}'+'@\n'
+      self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
+      #print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
 
  
   def OperationTechnology(self):
@@ -966,7 +1039,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       self.TibiaPng += 1
 
   #整体切换图片函数、单选点、多选点函数
-  def onSelect1(self):
+  def onSelect1(self,whoSend=None):
     self.ui.PointReset.setEnabled(True)
     print(self.FemurPng - 1)
 
@@ -974,7 +1047,8 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       if self.FemurPng - 1 <9:
         self.SwitchFemur()
         self.SelectSinglePoint()
-        self.sendDian()
+        if whoSend!='xiaopingmu':
+          self.sendDian()
       elif self.FemurPng - 1 == 9:
         
         self.SwitchFemur()
@@ -987,7 +1061,8 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
           self.MoreStart()
           self.ui.Select1.setVisible(False)
           self.ui.StopSelect.setVisible(True)
-        self.sendDian()
+        if whoSend!='xiaopingmu':
+          self.sendDian()
         self.onConfirm1_femur()
         
 
@@ -1006,7 +1081,8 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       if self.TibiaPng-1 < 6:
         self.SwitchTibia()
         self.SelectSinglePoint()
-        self.sendDian()
+        if whoSend!='xiaopingmu':
+          self.sendDian()
       elif self.TibiaPng-1 == 6:
         
         self.SwitchTibia()
@@ -1019,7 +1095,8 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
           self.MoreStart()
           self.ui.Select1.setVisible(False)
           self.ui.StopSelect.setVisible(True)
-        self.sendDian()
+        if whoSend!='xiaopingmu':
+          self.sendDian()
         self.onConfirm1_tibia()
       else:
         if self.ui.SingleSelect.checked:
@@ -1032,57 +1109,61 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
 #向小屏幕发送选取点位的信息
   def sendDian(self,reset=0):
-    if reset==0:
-      s1 = 0
-      s2 = 1
-      s3 = 0  # 股骨不重置
-      s4 = 0  # 胫骨不重置
-      if self.ui.ModuleName.text == "股骨配准":
-        s5 = 0
-      else:
-        s5 = 1
-        # 股骨或者胫骨图片
-      if s5 == 0:
-        s6 = self.FemurPng - 1  # 顺序
-      else:
-        s6 = self.TibiaPng - 1
-      s7 = 0
-      s8 = 0
-      self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}@'.encode())
-      print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
-    else:
-      s1 = 0
-      s2 = 1
-      if self.ui.ModuleName.text == "股骨配准":
-        s3 = 1  # 股骨重置
+    try:
+      if reset==0:
+        s1 = 0
+        s2 = 2
+        s3 = 0  # 股骨不重置
         s4 = 0  # 胫骨不重置
-
+        if self.ui.ModuleName.text == "股骨配准":
+          s5 = 0
+        else:
+          s5 = 1
+          # 股骨或者胫骨图片
+        if s5 == 0:
+          s6 = self.FemurPng - 1  # 顺序
+        else:
+          s6 = self.TibiaPng - 1
+        s7 = 0
+        s8 = '0@\n'
+        self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
+        print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
       else:
-        s3 = 0  # 股骨重置
-        s4 = 1  # 胫骨不重置
-      if self.ui.ModuleName.text == "股骨配准":
-        s5 = 0
-      else:
-        s5 = 1
-        # 股骨或者胫骨图片
-      if s5 == 0:
-        s6 = self.FemurPng - 1  # 顺序
-      else:
-        s6 = self.TibiaPng - 1
-      s7 = 0
-      s8 = 0
-      self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}@'.encode())
-      print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
+        s1 = 0
+        s2 = 2
+        if self.ui.ModuleName.text == "股骨配准":
+          s3 = 1  # 股骨重置
+          s4 = 0  # 胫骨不重置
+
+        else:
+          s3 = 0  # 股骨重置
+          s4 = 1  # 胫骨不重置
+        if self.ui.ModuleName.text == "股骨配准":
+          s5 = 0
+        else:
+          s5 = 1
+          # 股骨或者胫骨图片
+        if s5 == 0:
+          s6 = 1
+        else:
+          s6 = 1
+        s7 = 0
+        s8 = '0@\n'
+        self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
+        print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
+    except:
+      pass
 
 
 
 
-  def onNextArea(self):
+  def onNextArea(self,whoSend=None):
     if self.ui.ModuleName.text == "股骨配准" :
       self.SwitchFemur()
     elif self.ui.ModuleName.text == "胫骨配准" :
       self.SwitchTibia()
-    self.sendDian()
+    if whoSend!='xiaopingmu':
+      self.sendDian()
 
   #选点重置函数
   def onPointReset(self):
@@ -2272,7 +2353,10 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     # print(d_inside, d_outside, quxiAngle, waifanAngle)
     # print('Ifzf',Ifzf)
     if len(self.ui.GraphImage.children())==2:
-      self.updatePyqtgraph()
+      try:
+        self.updatePyqtgraph()
+      except:
+        pass
       self.updataJieGuJianxi(closet_outside,closet_inside,trans,TibiaJGM)
 
   def updataJieGuJianxi(self,closet_outside,closet_inside,trans,TibiaJGM):
@@ -8012,6 +8096,18 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     line2 = slicer.util.getNode('OutSide').GetLineLengthWorld()
     self.JieGuJianXi.SetNthControlPointLabel(0,str(round(line1,2))+'mm')
     self.JieGuJianXi.SetNthControlPointLabel(1,str(round(line2,2))+'mm')
+    s1 = 1
+    s2 = 1
+    s3 = 0  
+    s4 = 1
+    s5 = round(line1,2)
+    s6 = round(line1,2)
+    s7 = 0
+    s8 = '0@\n'
+    self.ser1.write(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
+    print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
+    time.sleep(0.15)
+    
 
   def PopupGraph(self):
     if self.ui.PopupImage.text == '弹出图像':
@@ -8071,9 +8167,12 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     Number = ["⑳","⑲","⑱","⑰","⑯","⑮","⑭","⑬","⑫","⑪","⑩","⑨","⑧","⑦","⑥","⑤","④","③","②","①"]
 
   def onstartDJ(self):
+
     self.ser1 = serial.Serial(  # 下面这些参数根据情况修改
       port='COM5',
-      baudrate=115200
+      baudrate=115200,
+      timeout=0.22,
+      write_timeout=0.1
     )
     print("串口状态:" + str(self.ser1.is_open))
 
@@ -8089,39 +8188,60 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
   def __recv_func__(self, ser1=None):
     while self.ser1.isOpen():
-      start = time.perf_counter()
-      print('刷新:',self.ser1.in_waiting)
+      #print('刷新:',self.ser1.in_waiting)
       try:
         if (self.ser1.in_waiting > 0):
           buffer = self.ser1.readline().decode('utf-8')
-          buf_list = buffer.split(',')
-          print('接收到的', buf_list)
-          s1, s2, s3, s4, s5, s6, s7, s8 = int(buf_list[0]), int(buf_list[1]), int(buf_list[2]), buf_list[3], int(buf_list[4]), int(buf_list[5]), buf_list[6], buf_list[7]
-          if s1 == 1:
-            if s2 == 0:
-              if s3<10:
-                  print('onSelect1')
-                  self.onSelect1()
-              else:
-                  print('onNextArea')
-                  self.onNextArea()
-            else:
-              if s3<6:
-                print('onSelect1')
-                self.onSelect1()
-              else:
-                print('onNextArea')
-                self.onNextArea()
+          self.handleCalc_do(buffer)
+          print('接收到的', buffer)
+          #s1, s2, s3, s4, s5, s6, s7, s8 = int(buf_list[0]), int(buf_list[1]), int(buf_list[2]), buf_list[3], int(buf_list[4]), int(buf_list[5]), buf_list[6], buf_list[7]
+          # if s1 == 1:
+          #   if s2 == 0:
+          #     if s3<11:
+          #         print('onSelect1')
+          #         self.onSelect1()
+          #     else:
+          #         print('onNextArea')
+          #         self.onNextArea()
+          #   else:
+          #     if s3<7:
+          #       print('onSelect1')
+          #       self.onSelect1()
+          #     else:
+          #       print('onNextArea')
+          #       self.onNextArea()
         elif (self.ser1.in_waiting <= 0):
           time.sleep(0.05)
 
       except:
         print('传输数据存在异常')
-      end = time.perf_counter()
-      print("运行时间为", round(end-start), 'seconds')
+      
+      time.sleep(0.1)
 
 
+  def handleCalc_do(self,s):
+      buf_list = s.split('@')
+      for i in range(len(buf_list)):
+          buf_list1=buf_list[i].split(',')
+          if len(buf_list1)==8:
+              self.handleData(buf_list1)
 
+  def handleData(self,buf):
+      if int(buf[0]) == 1:
+        if int(buf[1]) == 0:
+          if int(buf[2])<12:
+              print('onSelect1')
+              self.onSelect1('xiaopingmu')
+          else:
+              print('onNextArea')
+              self.onNextArea('xiaopingmu')
+        else:
+          if int(buf[2])<8:
+            print('onSelect1')
+            self.onSelect1('xiaopingmu')
+          else:
+            print('onNextArea')
+            self.onNextArea('xiaopingmu')
 
 
 
