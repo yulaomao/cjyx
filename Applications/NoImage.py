@@ -52,9 +52,6 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.layout.addWidget(uiWidget)
     self.ui = slicer.util.childWidgetVariables(uiWidget)
 
-    # Set scene in MRML widgets. Make sure that in Qt designer the top-level qMRMLWidget's
-    # "mrmlSceneChanged(vtkMRMLScene*)" signal in is connected to each MRML widget's.
-    # "setMRMLScene(vtkMRMLScene*)" slot.
     uiWidget.setMRMLScene(slicer.mrmlScene)
     #----------------------------------------------------------------------------------------
     self.iconsPath = os.path.join(os.path.dirname(__file__), 'Resources/Icons/NoImageIcon')
@@ -113,8 +110,8 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.currentModel = 0
     # self.WidgetList = [self.ui.InitWidget,self.ui.SystemPrepareWidget,self.ui.SSMWidget,self.ui.SSMWidget,self.ui.FemurToolWidget,self.ui.TibiaToolWidget,self.ui.ReportToolWidget,self.ui.NavigationToolWidget]
     # self.LabelList = ["无","初始化","系统准备","股骨配准","胫骨配准","规划","规划","报告","导航","无"]
-    self.WidgetList = [self.ui.SystemPrepareWidget,self.ui.SSMWidget,self.ui.SSMWidget,self.ui.FemurToolWidget,self.ui.TibiaToolWidget,self.ui.NavigationToolWidget]
-    self.LabelList = ["无","系统准备","股骨配准","胫骨配准","手术规划","手术规划","导航","无"]
+    self.WidgetList = [self.ui.InitWidget,self.ui.SystemPrepareWidget,self.ui.SSMWidget,self.ui.SSMWidget,self.ui.FemurToolWidget,self.ui.TibiaToolWidget,self.ui.NavigationToolWidget]
+    self.LabelList = ["无","初始化","系统准备","股骨配准","胫骨配准","手术规划","手术规划","导航","无"]
     self.WidgetShow(self.currentModel)
     self.ui.ReportToolWidget.setVisible(False)
     self.ui.BackToolButton.connect('clicked(bool)',self.onBackToolButton)
@@ -165,7 +162,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.ui.HPoint.clicked.connect(self.onHPoint)#选取H点
 
 
-    #---------------股骨规划-------------------------------------------------------
+    #------------------------股骨规划-------------------------------------------------
     self.ui.Parameter.connect('clicked(bool)', self.onParameter)#骨骼参数按钮
     self.ui.Adjustment.connect('clicked(bool)', self.onAdjustment)#截骨调整按钮
     self.ui.ViewChoose.connect('clicked(bool)', self.onViewSelect)#视图选择按钮
@@ -255,17 +252,21 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.ms = MySignals()
     # 关联处理该信号的函数
     self.ms.labeltxt.connect(self.handleCalc_do)
-
+    try:
+      self.onstartDJ()
+      print('###########蓝牙串口已开启###########')
+    except:
+      pass
     self.ifsend03=0
 
   #---------------前进后退----------------------------------------------- 
   def onForwardToolButton(self):
     #self.ui.ForwardToolButton.setEnabled(False)
-    if self.currentModel == 5:
+    if self.currentModel == 6:
       return
     
     self.currentModel += 1
-    if self.currentModel == 4:
+    if self.currentModel == 5:
       self.currentModel += 1
 
     self.WidgetShow(self.currentModel)
@@ -279,7 +280,6 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.ui.OperationPlanWidget.setVisible(False)#手术规划每部分小界面
     self.ui.NavigationWidget.setVisible(False)
     self.ui.Graph.setVisible(False)
-    self.ui.InitWidget.setVisible(0)
     
     for i in range(0,len(self.WidgetList)):
       self.WidgetList[i].setVisible(False)
@@ -288,13 +288,13 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.ui.ModuleName.setText(self.LabelList[index+1])
     self.ui.ForwardToolButton.setToolTip(self.LabelList[index+2])
     
-    # if index == 0:#初始化
-    #   for i in range(0,len(self.noimageWidget.findChildren("QLabel"))):
-    #     self.noimageWidget.findChildren("QLabel")[-1].delete()
+    if index == 0:#初始化
+      for i in range(0,len(self.noimageWidget.findChildren("QLabel"))):
+        self.noimageWidget.findChildren("QLabel")[-1].delete()
       
-    #   self.FourImage(True)
+      self.FourImage(True)
 
-    if index == 0:#系统准备
+    if index == 1:#系统准备
       self.FourImage(False)
       for i in range(0,len(self.noimageWidget.findChildren("QLabel"))):
         self.noimageWidget.findChildren("QLabel")[-1].delete()
@@ -308,7 +308,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       self.PngLabel.show()
       self.ui.ForwardToolButton.setEnabled(True)
 
-    if index == 1:#股骨配准
+    if index == 2:#股骨配准
       self.ui.tibiaPointWidget.setVisible(False)
       self.ui.femurPointWidget.setVisible(True)
       self.EnterSet()
@@ -326,7 +326,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       s8 = '0@\n'
       self.client.send(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
       print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
-    if index == 2: #胫骨配准
+    if index == 3: #胫骨配准
       self.ui.femurPointWidget.setVisible(False)
       self.ui.tibiaPointWidget.setVisible(True)
       self.EnterSet()
@@ -342,7 +342,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       s8 = '0@\n'
       self.client.send(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
       print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
-    if index == 3:#股骨规划
+    if index == 4:#股骨规划
       s1 = 0
       s2 = 3
       s3 = 0  
@@ -359,7 +359,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
       for i in range (0,len(self.noimageWidget.findChildren('QLabel'))):
         self.noimageWidget.findChildren('QLabel')[-1].delete()
-    if index == 4:#胫骨规划
+    if index == 5:#胫骨规划
       s1 = 0
       s2 = 3
       s3 = 0  
@@ -373,7 +373,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       self.HidePart()
       self.TibiaButtonChecked(None)
       self.ShowNode('Tibia')
-    if index == 5:#导航
+    if index == 6:#导航
       s1 = 0
       s2 = 3
       s3 = 1  
@@ -464,45 +464,24 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     # # print("thread2")
     # self._received_thread_.setName("Seria124")
     # self._received_thread_.start()
-    if self.ui.CTMRI.checked:
-      slicer.util.findChild(slicer.util.mainWindow(),"TopWidget").show()
-      slicer.util.findChild(slicer.util.mainWindow(),"MainToolBar").show()
-      slicer.util.findChild(slicer.util.mainWindow(),"NoImageWidget").hide()
-      slicer.util.findChild(slicer.util.mainWindow(),"ModulePanel").setMaximumWidth(99999)
-      slicer.util.moduleSelector().selectModule("Case_main")
-      slicer.util.findChild(slicer.util.mainWindow(),"NoImage").hide()
-
-    elif self.ui.Deformation.checked:
-      print('开始监听信号')
-      self.ui.ForwardToolButton.setEnabled(True)
-      self.onPrepare()
-      self.ifsend03=1
-      message = qt.QMessageBox(qt.QMessageBox.Information,'提示',"初始化成功！",qt.QMessageBox.Ok)
-      message.button(qt.QMessageBox().Ok).setText('确定')
-      message.exec()
-      self.ui.tool1.setEnabled(True)
-
-      try:
-        self.onstartDJ()
-        print('###########蓝牙串口已开启###########')
-      except:
-        pass
-      # s1 = 0
-      # s2 = 1
-      # s3 = 1
-      # s4 = 2
-      # s5 = 0
-      # s6 = 0
-      # s7 = 0
-      # s8 = f'{int(self.ui.tool2.enabled)}' + f'{int(self.ui.tool3.enabled)}' + f'{int(self.ui.tool4.enabled)}' + f'{int(self.ui.tool5.enabled)}' + f'{int(self.ui.tool6.enabled)}'+'@\n'
-      # self.client.send(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
-      # print('已发送',f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
-
-      NoImageToolWidget = slicer.util.findChild(slicer.util.mainWindow(),"NoImageToolWidget")
-      NoImageToolWidget.setVisible(True)
-      self.ui.ToolWidget.show()
-      self.ui.TitleWidget.show()
-      self.ui.ForwardToolButton.click()
+    print('开始监听信号')
+    self.ui.ForwardToolButton.setEnabled(True)
+    self.onPrepare()
+    self.ifsend03=1
+    message = qt.QMessageBox(qt.QMessageBox.Information,'提示',"初始化成功！",qt.QMessageBox.Ok)
+    message.button(qt.QMessageBox().Ok).setText('确定')
+    message.exec()
+    self.ui.tool1.setEnabled(True)
+    s1 = 0
+    s2 = 1
+    s3 = 1
+    s4 = 2
+    s5 = 0
+    s6 = 0
+    s7 = 0
+    s8 = f'{int(self.ui.tool2.enabled)}' + f'{int(self.ui.tool3.enabled)}' + f'{int(self.ui.tool4.enabled)}' + f'{int(self.ui.tool5.enabled)}' + f'{int(self.ui.tool6.enabled)}'+'@\n'
+    self.client.send(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
+    print('已发送',f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
 
 
 
@@ -615,7 +594,6 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       s8 = f'{int(self.ui.tool2.enabled)}' + f'{int(self.ui.tool3.enabled)}' + f'{int(self.ui.tool4.enabled)}' + f'{int(self.ui.tool5.enabled)}' + f'{int(self.ui.tool6.enabled)}'+'@\n'
       self.client.send(f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}'.encode())
       #print('已发送', f'{s1},{s2},{s3},{s4},{s5},{s6},{s7},{s8}')
-
  
   def OperationTechnology(self):
     try:
@@ -856,16 +834,17 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     for i in range(len(points)):
       From1node.AddControlPoint(points[i][0], points[i][1], points[i][2])
 
-  def ThreeDViewAndImageWidget(self,index):        
+  def ThreeDViewAndImageWidget(self,index):
+        
     if index == 0:#显示图片视图
-      self.FourWidget.setVisible(False)
-      self.noimageWidget.setVisible(True)
+        self.FourWidget.setVisible(False)
+        self.noimageWidget.setVisible(True)
     elif index == 1:#两者都显示
-      self.FourWidget.setVisible(True)
-      self.noimageWidget.setVisible(True)
+        self.FourWidget.setVisible(True)
+        self.noimageWidget.setVisible(True)
     elif index == 2:#显示三维窗口
-      self.FourWidget.setVisible(True)
-      self.noimageWidget.setVisible(False)
+        self.FourWidget.setVisible(True)
+        self.noimageWidget.setVisible(False)
 
   #切换三维视图和图片视图
   def onSwitch(self):
@@ -906,6 +885,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.setCheckBoxState(self.ui.femurPoint1,self.ui.femurPoint1Label)
     self.FemurPng = 2
     self.ui.Select1.setEnabled(True)
+  
   #胫骨校准时调用该函数选择图片
   def onTibiaRadioButton(self):
     for i in range(0,len(self.noimageWidget.findChildren("QLabel"))):
@@ -1004,6 +984,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
           label_femur = [self.ui.tibiaPoint7Label, self.ui.tibiaPoint8Label, self.ui.tibiaPoint9Label]
           label_femur[self.TibiaPng - 8].setText(Number[19 - self.TibiaPointCount[self.TibiaPng - 8]])
           self.TibiaPointCount[self.TibiaPng - 8] += 1
+  
   #停止选择
   def onStopSelect(self):
     Stylus = slicer.util.getNode("StylusTipToStylus")
@@ -1129,7 +1110,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
           self.ui.StopSelect.setVisible(True)
 
 
-#向小屏幕发送选取点位的信息
+  #向小屏幕发送选取点位的信息
   def sendDian(self,reset=0):
     try:
       if reset==0:
@@ -1920,9 +1901,9 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       self.buildPointsInFemur()
     self.Smooth_Model(self.model)
     self.StartClosestLine()
-
+  
+  #添加显示误差值功能，在针尖与模型表面最近点之间连线，显示距离
   def StartClosestLine(self):
-    #添加显示误差值功能，在针尖与模型表面最近点之间连线，显示距离
     p=None
     try:
       p = slicer.util.getNode('StylusTip')
@@ -1942,9 +1923,10 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     a.SetTextScale(3)
     self.ClosestLineObserver = StylusTip.AddObserver(slicer.vtkMRMLTransformNode.TransformModifiedEvent,
                                                           self.ShowClosestLine)
-
+ 
+  # 停止显示误差值功能
   def StopClosestLine(self):
-    # 添加显示误差值功能，在针尖与模型表面最近点之间连线，显示距离
+
     try:
       p = slicer.util.getNode('StylusTip')
       StylusTip = slicer.util.getNode('StylusTipToStylus')
@@ -4449,11 +4431,11 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
   # 股骨截骨调整
   def onAdjustment(self):
-    rotationTransformNode = slicer.util.getNode('DianjiToTracker1')
-    try:
-      rotationTransformNode.RemoveObserver(self.updataForceAngle)
-    except:
-      pass
+    # rotationTransformNode = slicer.util.getNode('DianjiToTracker1')
+    # try:
+    #   rotationTransformNode.RemoveObserver(self.updataForceAngle)
+    # except:
+    #   pass
     try:
       slicer.mrmlScene.RemoveNode(slicer.util.getNode("TibiaLine"))
       slicer.mrmlScene.RemoveNode(slicer.util.getNode("FemurLine"))
@@ -5071,7 +5053,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     cameraNode.SetViewUp(viewUpDirection)
     cameraNode.SetAndObserveTransformNodeID(transNode.GetID())
 
-  
+  #显示力线——确认
   def onForceConfirm(self):
     angle = 0
     self.ui.ForceAngle.setText('力线角度：'+str(angle))
@@ -5083,7 +5065,6 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       slicer.mrmlScene.RemoveNode(slicer.util.getNode("TibiaLine"))      
     except:
       pass
-
     ras1,ras2,ras3,ras4 = [0,0,0],[0,0,0],[0,0,0],[0,0,0]
     slicer.util.getNode('股骨头球心').GetNthControlPointPositionWorld(0, ras1)
     slicer.util.getNode('开髓点').GetNthControlPointPositionWorld(0, ras2)
@@ -5357,7 +5338,7 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         TtransformYueShu.SetAndObserveTransformNodeID(Ttransform3.GetID())
         self.EtctMove('变换_3', 'TibiaToTracker')
         self.addAxisTibia()
-        self.SelectTibiaJiaTi()
+        self.SelectTibiaJiaTi()#推荐胫骨假体
         #self.TibiaJiaTiload.SetAndObserveTransformNodeID(Ttransform3.GetID())
         #self.TibiaJiaTiload.SetDisplayVisibility(False)
         roiNode = slicer.mrmlScene.AddNewNodeByClass('vtkMRMLMarkupsROINode', '胫骨近端切割')
@@ -5396,8 +5377,6 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     TtransformYueShu = slicer.util.getNode('变换_约束')
     TibiaJieGu.SetAndObserveTransformNodeID(TtransformYueShu.GetID())
     point = [0, 0, 0]
-    point1 = [0, 0, 0]
-    point3 = [0, 0, 0]
     slicer.util.getNode('内侧高点').GetNthControlPointPositionWorld(0, point)
     
     self.HideNode('胫骨截骨面')
@@ -5439,7 +5418,8 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     if x < 0:
       d = -d
     distance = 6 + d
-
+    point1 = [0, 0, 0]
+    point3 = [0, 0, 0]
     slicer.util.getNode('外侧高点').GetNthControlPointPositionWorld(0, point1)
     slicer.util.getNode('胫骨隆凸').GetNthControlPointPositionWorld(0, point3)
 
@@ -5543,16 +5523,6 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             index1.append(i)
           
 
-      # if len(judge1)<1:
-      #     TransformTmp = slicer.util.getNode('变换_胫骨')
-      #     c =slicer.util.arrayFromTransformMatrix(TransformTmp)
-      #     c[1][3]=c[1][3]+dis[10]
-      #     TransformTmp.SetAndObserveMatrixTransformToParent(slicer.util.vtkMatrixFromArray(c))
-      #     self.TibiaJtSelectNum=1
-      #     self.SelectTibiaJiaTi()
-      #     return 1
-          
-
         if len(judge1)>=1:
           max_judge1=judge1.index(max(judge1))
           print('judge',judge1)
@@ -5566,17 +5536,10 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
           self.TibiaSelect = self.select
 
         Name = 'Tibia-'+list[self.TibiaSelect]
+        #报错 onTibiaJiaTi 找不到 胫骨切割
         self.ui.TibiaJiaTi.setCurrentText(Name)
         self.ui.JiaTiNameT.setText(Name)
 
-      #self.AddKongBai()
-      #设置表头文字颜色
-      # self.ui.TibiaTableWidget.verticalHeaderItem(self.TibiaSelect).setForeground(qt.QBrush(qt.QColor(48,47,45)))
-      # #设置表头背景颜色
-      # self.ui.TibiaTableWidget.verticalHeaderItem(self.TibiaSelect).setBackground(qt.QColor(124,189,39))
-      # self.ui.TibiaTableWidget.horizontalHeaderItem(self.select).setForeground(qt.QBrush(qt.QColor(48,47,45)))
-      # self.ui.TibiaTableWidget.horizontalHeaderItem(self.select).setBackground(qt.QColor(124,189,39))
-      # self.ui.TibiaTableWidget.item(self.TibiaSelect, self.select).setBackground(qt.QColor(124, 189, 39))
   
   #加载胫骨假体    
   def loadTibiaJiaTi(self, name):
@@ -5595,6 +5558,11 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
   #胫骨截骨调整
   def onAdjustment2(self):
+    # rotationTransformNode = slicer.util.getNode('DianjiToTracker1')
+    # try:
+    #   rotationTransformNode.RemoveObserver(self.updataForceAngle)
+    # except:
+    #   pass
     slicer.app.layoutManager().setLayout(slicer.vtkMRMLLayoutNode.SlicerLayoutTriple3DEndoscopyView)
     self.ThreeDViewAndImageWidget(2)
     self.loadTibiaJiaTi(self.ui.TibiaJiaTi.currentText)
@@ -5996,7 +5964,10 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
       slicer.modules.TibiaPopupWidget.ui.xMoveButton1.click()
       self.ui.BoneButton.click()
       self.ui.BoneButton.click()
-    self.ShowHide()
+    try:
+      self.ShowHide()
+    except:
+      print("没有胫骨切割")
 
   def onFemurSwitch(self):
     self.currentModel = 4
@@ -8230,7 +8201,6 @@ class NoImageWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         print('已连接')
       except:
         print('等待连接')
-        waitStatu = 0
         time.sleep(1)
     received_thread_ = threading.Thread(target=self.recvfunc, args=(self,))
     # print("thread")
